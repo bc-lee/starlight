@@ -14,7 +14,7 @@
             implementationClass="io.github.bclee.starlight.StarlarkFileType"
             fieldName="INSTANCE"
             extensions="bzl;bazel"
-            fileNames="BUILD;WORKSPACE;MODULE.bazel"
+            fileNames="BUILD;WORKSPACE;WORKSPACE.bzlmod;MODULE.bazel"
         />
 
         <lang.parserDefinition

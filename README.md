@@ -10,7 +10,7 @@ Starlight (Starlark + Light) is an IntelliJ IDEA plugin that adds lightweight St
 ## Supported Files
 
 - `BUILD`
-- `WORKSPACE`
+- `WORKSPACE`, `WORKSPACE.bzlmod`
 - `MODULE.bazel`
 - `*.bzl`
 - `*.bazel`
