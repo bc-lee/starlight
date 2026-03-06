@@ -1,0 +1,5 @@
+Starlight includes adapted lexer/parser components from JetBrains Hirschgarten
+(https://github.com/JetBrains/hirschgarten), licensed under Apache License 2.0.
+
+The adapted components include the Starlight lexer, parser, token definitions,
+and related syntax highlighting, commenting functionality, icons, and tests.

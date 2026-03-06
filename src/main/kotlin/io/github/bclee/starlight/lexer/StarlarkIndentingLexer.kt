@@ -19,8 +19,8 @@ package io.github.bclee.starlight.lexer
 import com.intellij.lexer.FlexAdapter
 import com.intellij.psi.tree.IElementType
 import it.unimi.dsi.fastutil.ints.IntArrayList
-import org.jetbrains.bazel.languages.starlark.elements.StarlarkTokenSets
-import org.jetbrains.bazel.languages.starlark.elements.StarlarkTokenTypes
+import io.github.bclee.starlight.elements.StarlarkTokenSets
+import io.github.bclee.starlight.elements.StarlarkTokenTypes
 
 private open class PendingToken(
   var type: IElementType?,

@@ -1,0 +1,3 @@
+FILE
+  ASTWrapperPsiElement(RETURN_STATEMENT)
+    PsiElement(Starlark:return)('return')

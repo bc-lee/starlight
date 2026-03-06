@@ -16,20 +16,16 @@
 // Original Source: https://github.com/JetBrains/hirschgarten/blob/51366707c8894dfb6fffbf51e60848785c26b3de/pluginTests/test/org/jetbrains/bazel/languages/starlark/parser/StarlarkParsingStmtTest.kt
 package io.github.bclee.starlight.parser
 
-import org.jetbrains.bazel.languages.starlark.fixtures.StarlarkParsingTestCase
+import com.intellij.testFramework.ParsingTestCase
 
-class StarlarkParsingStmtTest : StarlarkParsingTestCase("stmt") {
+class StarlarkParsingStmtTest : ParsingTestCase("parser/stmt", "bzl", StarlarkParserDefinition()) {
   fun testAssignStmt() = doTest(true)
-
   fun testBreakStmt() = doTest(true)
-
   fun testContinueStmt() = doTest(true)
-
   fun testExprStmt() = doTest(true)
-
   fun testLoadStmt() = doTest(true)
-
   fun testPassStmt() = doTest(true)
-
   fun testReturnStmt() = doTest(true)
+
+  override fun getTestDataPath(): String = "src/test/testData"
 }

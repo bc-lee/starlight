@@ -26,11 +26,11 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.tree.TokenSet
-import org.jetbrains.bazel.languages.starlark.StarlarkLanguage
-import org.jetbrains.bazel.languages.starlark.elements.StarlarkElementTypes
-import org.jetbrains.bazel.languages.starlark.elements.StarlarkTokenSets
-import org.jetbrains.bazel.languages.starlark.lexer.StarlarkIndentingLexer
-import org.jetbrains.bazel.languages.starlark.psi.StarlarkFile
+import io.github.bclee.starlight.StarlarkLanguage
+import io.github.bclee.starlight.elements.StarlarkElementTypes
+import io.github.bclee.starlight.elements.StarlarkTokenSets
+import io.github.bclee.starlight.lexer.StarlarkIndentingLexer
+import io.github.bclee.starlight.psi.StarlarkFile
 
 class StarlarkParserDefinition : ParserDefinition {
   private val file = IFileElementType(StarlarkLanguage)

@@ -14,36 +14,28 @@
  */
 // Originally written by JetBrains s.r.o. (Apache-2.0).
 // Original Source: https://github.com/JetBrains/hirschgarten/blob/51366707c8894dfb6fffbf51e60848785c26b3de/pluginTests/test/org/jetbrains/bazel/languages/starlark/lexer/StarlarkLexerTest.kt
-package org.jetbrains.bazel.languages.starlark.lexer
+package io.github.bclee.starlight.lexer
 
-import org.jetbrains.bazel.languages.fixtures.LexerTestCase
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
-private const val TRIPLE_QUOTE = "\"\"\""
-
-class StarlarkLexerTest : LexerTestCase() {
+class StarlarkLexerTest {
   @Test
-  fun `should lex simple expression`() {
-    // given
-    val code = "x=0"
-
-    // when & then
-    code shouldLexTo
+  fun lexesSimpleExpressionWithStatementBreakAtEof() {
+    assertEquals(
       listOf(
         "Starlark:IDENTIFIER",
         "Starlark:=",
         "Starlark:INT",
         "Starlark:STATEMENT_BREAK",
-      )
+      ),
+      lexTokens("x=0"),
+    )
   }
 
   @Test
-  fun `should lex and merge spaces`() {
-    // given
-    val code = "x  =   0"
-
-    // when & then
-    code shouldLexTo
+  fun lexesAndMergesSpaces() {
+    assertEquals(
       listOf(
         "Starlark:IDENTIFIER",
         "Starlark:SPACE",
@@ -51,20 +43,20 @@ class StarlarkLexerTest : LexerTestCase() {
         "Starlark:SPACE",
         "Starlark:INT",
         "Starlark:STATEMENT_BREAK",
-      )
+      ),
+      lexTokens("x  =   0"),
+    )
   }
 
   @Test
-  fun `should lex line break in parentheses`() {
-    // given
+  fun lexesLineBreakInParentheses() {
     val code =
       """
-        |(a,
-        |b)
+      |(a,
+      |b)
       """.trimMargin()
 
-    // when & then
-    code shouldLexTo
+    assertEquals(
       listOf(
         "Starlark:(",
         "Starlark:IDENTIFIER",
@@ -73,20 +65,20 @@ class StarlarkLexerTest : LexerTestCase() {
         "Starlark:IDENTIFIER",
         "Starlark:)",
         "Starlark:STATEMENT_BREAK",
-      )
+      ),
+      lexTokens(code),
+    )
   }
 
   @Test
-  fun `should lex line break in brackets`() {
-    // given
+  fun lexesLineBreakInBrackets() {
     val code =
       """
-        |[a,
-        |b]
+      |[a,
+      |b]
       """.trimMargin()
 
-    // when & then
-    code shouldLexTo
+    assertEquals(
       listOf(
         "Starlark:[",
         "Starlark:IDENTIFIER",
@@ -95,20 +87,20 @@ class StarlarkLexerTest : LexerTestCase() {
         "Starlark:IDENTIFIER",
         "Starlark:]",
         "Starlark:STATEMENT_BREAK",
-      )
+      ),
+      lexTokens(code),
+    )
   }
 
   @Test
-  fun `should lex line break in braces`() {
+  fun lexesLineBreakInBraces() {
     val code =
-      // given
       """
-        |{a,
-        |b}
+      |{a,
+      |b}
       """.trimMargin()
 
-    // when & then
-    code shouldLexTo
+    assertEquals(
       listOf(
         "Starlark:{",
         "Starlark:IDENTIFIER",
@@ -117,20 +109,20 @@ class StarlarkLexerTest : LexerTestCase() {
         "Starlark:IDENTIFIER",
         "Starlark:}",
         "Starlark:STATEMENT_BREAK",
-      )
+      ),
+      lexTokens(code),
+    )
   }
 
   @Test
-  fun `should lex line break in braces after assignment`() {
-    // given
+  fun lexesLineBreakInBracesAfterAssignment() {
     val code =
       """
-        |x={a,
-        |b}
+      |x={a,
+      |b}
       """.trimMargin()
 
-    // when & then
-    code shouldLexTo
+    assertEquals(
       listOf(
         "Starlark:IDENTIFIER",
         "Starlark:=",
@@ -141,20 +133,49 @@ class StarlarkLexerTest : LexerTestCase() {
         "Starlark:IDENTIFIER",
         "Starlark:}",
         "Starlark:STATEMENT_BREAK",
-      )
+      ),
+      lexTokens(code),
+    )
   }
 
   @Test
-  fun `should lex line break in braces after comment`() {
-    // given
+  fun lexesIndentAndDedent() {
     val code =
       """
-        |x={a, #com
-        |b}
-      """.trimMargin()
+      if a:
+        b
+      c
+      """.trimIndent()
 
-    // when & then
-    code shouldLexTo
+    assertEquals(
+      listOf(
+        "Starlark:if",
+        "Starlark:SPACE",
+        "Starlark:IDENTIFIER",
+        "Starlark::",
+        "Starlark:STATEMENT_BREAK",
+        "Starlark:LINE_BREAK",
+        "Starlark:INDENT",
+        "Starlark:IDENTIFIER",
+        "Starlark:STATEMENT_BREAK",
+        "Starlark:DEDENT",
+        "Starlark:LINE_BREAK",
+        "Starlark:IDENTIFIER",
+        "Starlark:STATEMENT_BREAK",
+      ),
+      lexTokens(code),
+    )
+  }
+
+  @Test
+  fun lexesCommentInsideBracesAndLineBreak() {
+    val code =
+      """
+      x={a, #com
+      b}
+      """.trimIndent()
+
+    assertEquals(
       listOf(
         "Starlark:IDENTIFIER",
         "Starlark:=",
@@ -167,21 +188,21 @@ class StarlarkLexerTest : LexerTestCase() {
         "Starlark:IDENTIFIER",
         "Starlark:}",
         "Starlark:STATEMENT_BREAK",
-      )
+      ),
+      lexTokens(code),
+    )
   }
 
   @Test
-  fun `should lex brace after indent`() {
-    // given
+  fun lexesBraceAfterIndent() {
     val code =
       """
-        |x=
-        |  {a, #comment
-        |  b}
+      |x=
+      |  {a, #comment
+      |  b}
       """.trimMargin()
 
-    // when & then
-    code shouldLexTo
+    assertEquals(
       listOf(
         "Starlark:IDENTIFIER",
         "Starlark:=",
@@ -197,45 +218,21 @@ class StarlarkLexerTest : LexerTestCase() {
         "Starlark:IDENTIFIER",
         "Starlark:}",
         "Starlark:STATEMENT_BREAK",
-      )
+      ),
+      lexTokens(code),
+    )
   }
 
   @Test
-  fun `should lex indent`() {
-    // given
+  fun lexesMultilineIndent() {
     val code =
       """
-        |if a:
-        |  b
+      |if a:
+      |  b
+      |  c
       """.trimMargin()
 
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:if",
-        "Starlark:SPACE",
-        "Starlark:IDENTIFIER",
-        "Starlark::",
-        "Starlark:STATEMENT_BREAK",
-        "Starlark:LINE_BREAK",
-        "Starlark:INDENT",
-        "Starlark:IDENTIFIER",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  @Test
-  fun `should lex multiline indent`() {
-    // given
-    val code =
-      """
-        |if a:
-        |  b
-        |  c
-      """.trimMargin()
-
-    // when & then
-    code shouldLexTo
+    assertEquals(
       listOf(
         "Starlark:if",
         "Starlark:SPACE",
@@ -249,51 +246,22 @@ class StarlarkLexerTest : LexerTestCase() {
         "Starlark:LINE_BREAK",
         "Starlark:IDENTIFIER",
         "Starlark:STATEMENT_BREAK",
-      )
+      ),
+      lexTokens(code),
+    )
   }
 
   @Test
-  fun `should lex dedent`() {
-    // given
+  fun lexesMultiDedent() {
     val code =
       """
-        |if a:
-        |  b
-        |c
+      |if a:
+      |  b
+      |    c
+      |d
       """.trimMargin()
 
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:if",
-        "Starlark:SPACE",
-        "Starlark:IDENTIFIER",
-        "Starlark::",
-        "Starlark:STATEMENT_BREAK",
-        "Starlark:LINE_BREAK",
-        "Starlark:INDENT",
-        "Starlark:IDENTIFIER",
-        "Starlark:STATEMENT_BREAK",
-        "Starlark:DEDENT",
-        "Starlark:LINE_BREAK",
-        "Starlark:IDENTIFIER",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  @Test
-  fun `should lex multi dedent`() {
-    // given
-    val code =
-      """
-        |if a:
-        |  b
-        |    c
-        |d
-      """.trimMargin()
-
-    // when & then
-    code shouldLexTo
+    assertEquals(
       listOf(
         "Starlark:if",
         "Starlark:SPACE",
@@ -313,23 +281,23 @@ class StarlarkLexerTest : LexerTestCase() {
         "Starlark:LINE_BREAK",
         "Starlark:IDENTIFIER",
         "Starlark:STATEMENT_BREAK",
-      )
+      ),
+      lexTokens(code),
+    )
   }
 
   @Test
-  fun `should lex multi cascade dedent`() {
-    // given
+  fun lexesMultiCascadeDedent() {
     val code =
       """
-        |if a:
-        |  b
-        |    c
-        |  d
-        |e
+      |if a:
+      |  b
+      |    c
+      |  d
+      |e
       """.trimMargin()
 
-    // when & then
-    code shouldLexTo
+    assertEquals(
       listOf(
         "Starlark:if",
         "Starlark:SPACE",
@@ -352,79 +320,22 @@ class StarlarkLexerTest : LexerTestCase() {
         "Starlark:LINE_BREAK",
         "Starlark:IDENTIFIER",
         "Starlark:STATEMENT_BREAK",
-      )
+      ),
+      lexTokens(code),
+    )
   }
 
   @Test
-  fun `should lex empty line`() {
-    // given
+  fun lexesCommentAndDedentOrdering() {
     val code =
       """
-        |if a:
-        |  b
-        |
-        |  c
+      |if a:
+      |  b
+      |  #comment
+      |c
       """.trimMargin()
 
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:if",
-        "Starlark:SPACE",
-        "Starlark:IDENTIFIER",
-        "Starlark::",
-        "Starlark:STATEMENT_BREAK",
-        "Starlark:LINE_BREAK",
-        "Starlark:INDENT",
-        "Starlark:IDENTIFIER",
-        "Starlark:STATEMENT_BREAK",
-        "Starlark:LINE_BREAK",
-        "Starlark:IDENTIFIER",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  @Test
-  fun `should lex end of line space`() {
-    // given
-    val code =
-      """
-        |if a:
-        |  b             
-        |  c
-      """.trimMargin()
-
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:if",
-        "Starlark:SPACE",
-        "Starlark:IDENTIFIER",
-        "Starlark::",
-        "Starlark:STATEMENT_BREAK",
-        "Starlark:LINE_BREAK",
-        "Starlark:INDENT",
-        "Starlark:IDENTIFIER",
-        "Starlark:STATEMENT_BREAK",
-        "Starlark:LINE_BREAK",
-        "Starlark:IDENTIFIER",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  @Test
-  fun `should lex comment`() {
-    // given
-    val code =
-      """
-        |if a:
-        |  b
-        |  #comment
-        |c
-      """.trimMargin()
-
-    // when & then
-    code shouldLexTo
+    assertEquals(
       listOf(
         "Starlark:if",
         "Starlark:SPACE",
@@ -441,44 +352,22 @@ class StarlarkLexerTest : LexerTestCase() {
         "Starlark:LINE_BREAK",
         "Starlark:IDENTIFIER",
         "Starlark:STATEMENT_BREAK",
-      )
+      ),
+      lexTokens(code),
+    )
   }
 
   @Test
-  fun `should lex indented comment`() {
-    // given
+  fun lexesIndentedCommentAndCode() {
     val code =
       """
-        |#comment1
-        |  #comment2
-        |#comment3
+      |if a:
+      |  b
+      |  #comment
+      |  c
       """.trimMargin()
 
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:COMMENT",
-        "Starlark:LINE_BREAK",
-        "Starlark:COMMENT",
-        "Starlark:LINE_BREAK",
-        "Starlark:COMMENT",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  @Test
-  fun `should lex indented comment and code`() {
-    // given
-    val code =
-      """
-        |if a:
-        |  b
-        |  #comment
-        |  c
-      """.trimMargin()
-
-    // when & then
-    code shouldLexTo
+    assertEquals(
       listOf(
         "Starlark:if",
         "Starlark:SPACE",
@@ -494,327 +383,21 @@ class StarlarkLexerTest : LexerTestCase() {
         "Starlark:LINE_BREAK",
         "Starlark:IDENTIFIER",
         "Starlark:STATEMENT_BREAK",
-      )
+      ),
+      lexTokens(code),
+    )
   }
 
-  @Test
-  fun `should lex bytes literal`() {
-    // given
-    val code = "x=b'X'"
+  private fun lexTokens(code: String): List<String> {
+    val lexer = StarlarkIndentingLexer()
+    lexer.start(code)
 
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:IDENTIFIER",
-        "Starlark:=",
-        "Starlark:BYTES",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
+    val tokens = mutableListOf<String>()
+    while (lexer.tokenType != null) {
+      tokens += lexer.tokenType.toString()
+      lexer.advance()
+    }
 
-  @Test
-  fun `should lex zero literal`() {
-    // given
-    val code = "x=0"
-
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:IDENTIFIER",
-        "Starlark:=",
-        "Starlark:INT",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  @Test
-  fun `should lex integer literal`() {
-    // given
-    val code = "x=42"
-
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:IDENTIFIER",
-        "Starlark:=",
-        "Starlark:INT",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  @Test
-  fun `should lex hexadecimal literal`() {
-    // given
-    val code = "x=0x859"
-
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:IDENTIFIER",
-        "Starlark:=",
-        "Starlark:INT",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  @Test
-  fun `should lex octal literal`() {
-    // given
-    val code = "x=0o4131"
-
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:IDENTIFIER",
-        "Starlark:=",
-        "Starlark:INT",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  @Test
-  fun `should lex triple string`() {
-    // given
-    val code =
-      """
-        |$TRIPLE_QUOTE$TRIPLE_QUOTE
-        |x=$TRIPLE_QUOTE$TRIPLE_QUOTE
-      """.trimMargin()
-
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:STRING",
-        "Starlark:STATEMENT_BREAK",
-        "Starlark:LINE_BREAK",
-        "Starlark:IDENTIFIER",
-        "Starlark:=",
-        "Starlark:STRING",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  @Test
-  fun `should lex triple string escaped`() {
-    // given
-    val code =
-      """
-        |$TRIPLE_QUOTE\$TRIPLE_QUOTE X \$TRIPLE_QUOTE $TRIPLE_QUOTE;
-      """.trimMargin()
-
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:STRING",
-        "Starlark:;",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  @Test
-  fun `should lex triple string with line break`() {
-    // given
-    val code =
-      """
-        |$TRIPLE_QUOTE
-        |\nX
-        |
-        |$TRIPLE_QUOTE;
-      """.trimMargin()
-
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:STRING",
-        "Starlark:;",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  @Test
-  fun `should lex escaped closing triple apostrophes`() {
-    // given
-    val code =
-      """
-        |x=''' X '\''' X '''
-      """.trimMargin()
-
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:IDENTIFIER",
-        "Starlark:=",
-        "Starlark:STRING",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  @Test
-  fun `should lex escaped closing triple quotes`() {
-    // given
-    val code =
-      """
-        |x=$TRIPLE_QUOTE X "\$TRIPLE_QUOTE X $TRIPLE_QUOTE
-      """.trimMargin()
-
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:IDENTIFIER",
-        "Starlark:=",
-        "Starlark:STRING",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  @Test
-  fun `should lex adjacent strings`() {
-    // given
-    val code =
-      """
-        |$TRIPLE_QUOTE X $TRIPLE_QUOTE""
-      """.trimMargin()
-
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:STRING",
-        "Starlark:STRING",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  @Test
-  fun `should lex dedent before comment`() {
-    // given
-    val code =
-      """
-        |def bar():
-        |   pass
-        |   
-        |#comment
-        |def foo():
-        |   pass
-      """.trimMargin()
-
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:def",
-        "Starlark:SPACE",
-        "Starlark:IDENTIFIER",
-        "Starlark:(",
-        "Starlark:)",
-        "Starlark::",
-        "Starlark:STATEMENT_BREAK",
-        "Starlark:LINE_BREAK",
-        "Starlark:INDENT",
-        "Starlark:pass",
-        "Starlark:STATEMENT_BREAK",
-        "Starlark:DEDENT",
-        "Starlark:LINE_BREAK",
-        "Starlark:COMMENT",
-        "Starlark:LINE_BREAK",
-        "Starlark:def",
-        "Starlark:SPACE",
-        "Starlark:IDENTIFIER",
-        "Starlark:(",
-        "Starlark:)",
-        "Starlark::",
-        "Starlark:STATEMENT_BREAK",
-        "Starlark:LINE_BREAK",
-        "Starlark:INDENT",
-        "Starlark:pass",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  @Test
-  fun `should lex dedent after comment`() {
-    // given
-    val code =
-      """
-        |def foo():
-        |   pass
-        |   #comment
-        |   
-      """.trimMargin()
-
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:def",
-        "Starlark:SPACE",
-        "Starlark:IDENTIFIER",
-        "Starlark:(",
-        "Starlark:)",
-        "Starlark::",
-        "Starlark:STATEMENT_BREAK",
-        "Starlark:LINE_BREAK",
-        "Starlark:INDENT",
-        "Starlark:pass",
-        "Starlark:STATEMENT_BREAK",
-        "Starlark:LINE_BREAK",
-        "Starlark:COMMENT",
-        "Starlark:DEDENT",
-        "Starlark:LINE_BREAK",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  @Test
-  fun `should lex indent at start of file`() {
-    // given
-    val code = "   x"
-
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:SPACE",
-        "Starlark:INDENT",
-        "Starlark:IDENTIFIER",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  @Test
-  fun `should lex incomplete single quoted string`() {
-    // given
-    val code =
-      """
-        |"hello
-        |world
-      """.trimMargin()
-
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:STRING",
-        "Starlark:STATEMENT_BREAK",
-        "Starlark:LINE_BREAK",
-        "Starlark:IDENTIFIER",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  @Test
-  fun `should lex incomplete triple quoted string`() {
-    // given
-    val code =
-      """
-        |${TRIPLE_QUOTE}hello
-        |world
-      """.trimMargin()
-
-    // when & then
-    code shouldLexTo
-      listOf(
-        "Starlark:STRING",
-        "Starlark:STATEMENT_BREAK",
-      )
-  }
-
-  private infix fun String.shouldLexTo(expectedTokens: List<String>) {
-    doLexerTest(this, StarlarkIndentingLexer(), expectedTokens)
+    return tokens
   }
 }

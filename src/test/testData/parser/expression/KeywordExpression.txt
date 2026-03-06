@@ -1,0 +1,12 @@
+FILE
+  ASTWrapperPsiElement(EXPRESSION_STATEMENT)
+    ASTWrapperPsiElement(NONE_LITERAL_EXPRESSION)
+      PsiElement(Starlark:None)('None')
+  PsiWhiteSpace('\n')
+  ASTWrapperPsiElement(EXPRESSION_STATEMENT)
+    ASTWrapperPsiElement(TRUE_LITERAL_EXPRESSION)
+      PsiElement(Starlark:True)('True')
+  PsiWhiteSpace('\n')
+  ASTWrapperPsiElement(EXPRESSION_STATEMENT)
+    ASTWrapperPsiElement(FALSE_LITERAL_EXPRESSION)
+      PsiElement(Starlark:False)('False')

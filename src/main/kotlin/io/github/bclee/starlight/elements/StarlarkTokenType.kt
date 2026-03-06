@@ -17,7 +17,7 @@
 package io.github.bclee.starlight.elements
 
 import com.intellij.psi.tree.IElementType
-import org.jetbrains.bazel.languages.starlark.StarlarkLanguage
+import io.github.bclee.starlight.StarlarkLanguage
 
 class StarlarkTokenType(debugName: String) : IElementType(debugName, StarlarkLanguage) {
   override fun toString(): String = "Starlark:" + super.toString()

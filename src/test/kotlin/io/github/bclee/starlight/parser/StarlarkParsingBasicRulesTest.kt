@@ -16,18 +16,15 @@
 // Original Source: https://github.com/JetBrains/hirschgarten/blob/51366707c8894dfb6fffbf51e60848785c26b3de/pluginTests/test/org/jetbrains/bazel/languages/starlark/parser/StarlarkParsingBasicRulesTest.kt
 package io.github.bclee.starlight.parser
 
-import org.jetbrains.bazel.languages.starlark.fixtures.StarlarkParsingTestCase
+import com.intellij.testFramework.ParsingTestCase
 
-class StarlarkParsingBasicRulesTest : StarlarkParsingTestCase("basicRules") {
+class StarlarkParsingBasicRulesTest : ParsingTestCase("parser/basicRules", "bzl", StarlarkParserDefinition()) {
   fun testArguments() = doTest(true)
-
   fun testCompClause() = doTest(true)
-
   fun testEntries() = doTest(true)
-
+  fun testKeywordOnlyBoundaryMisuse() = doTest(true)
   fun testOperand() = doTest(true)
-
   fun testParameters() = doTest(true)
 
-  fun testKeywordOnlyBoundaryMisuse() = doTest(true)
+  override fun getTestDataPath(): String = "src/test/testData"
 }

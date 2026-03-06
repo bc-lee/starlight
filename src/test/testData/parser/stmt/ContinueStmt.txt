@@ -1,0 +1,3 @@
+FILE
+  ASTWrapperPsiElement(CONTINUE_STATEMENT)
+    PsiElement(Starlark:continue)('continue')

@@ -18,9 +18,9 @@ package io.github.bclee.starlight.parser
 
 import com.intellij.lang.PsiBuilder.Marker
 import com.intellij.psi.tree.IElementType
-import org.jetbrains.bazel.languages.starlark.StarlarkBundle
-import org.jetbrains.bazel.languages.starlark.elements.StarlarkElementTypes
-import org.jetbrains.bazel.languages.starlark.elements.StarlarkTokenTypes
+import io.github.bclee.starlight.StarlarkBundle
+import io.github.bclee.starlight.elements.StarlarkElementTypes
+import io.github.bclee.starlight.elements.StarlarkTokenTypes
 
 class FunctionParsing(context: ParsingContext) : Parsing(context) {
   fun parseFunction(functionMarker: Marker) {

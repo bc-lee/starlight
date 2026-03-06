@@ -20,10 +20,10 @@ import com.intellij.lang.PsiBuilder
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.NlsContexts.ParsingError
 import com.intellij.psi.tree.IElementType
-import org.jetbrains.bazel.languages.starlark.StarlarkBundle
-import org.jetbrains.bazel.languages.starlark.elements.StarlarkTokenSets
-import org.jetbrains.bazel.languages.starlark.elements.StarlarkTokenType
-import org.jetbrains.bazel.languages.starlark.elements.StarlarkTokenTypes
+import io.github.bclee.starlight.StarlarkBundle
+import io.github.bclee.starlight.elements.StarlarkTokenSets
+import io.github.bclee.starlight.elements.StarlarkTokenType
+import io.github.bclee.starlight.elements.StarlarkTokenTypes
 
 open class Parsing(val context: ParsingContext) {
   protected val builder = context.builder

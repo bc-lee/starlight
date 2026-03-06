@@ -16,18 +16,15 @@
 // Original Source: https://github.com/JetBrains/hirschgarten/blob/51366707c8894dfb6fffbf51e60848785c26b3de/pluginTests/test/org/jetbrains/bazel/languages/starlark/parser/StarlarkParsingExpressionTest.kt
 package io.github.bclee.starlight.parser
 
-import org.jetbrains.bazel.languages.starlark.fixtures.StarlarkParsingTestCase
+import com.intellij.testFramework.ParsingTestCase
 
-class StarlarkParsingExpressionTest : StarlarkParsingTestCase("expression") {
+class StarlarkParsingExpressionTest : ParsingTestCase("parser/expression", "bzl", StarlarkParserDefinition()) {
   fun testBinaryExpression() = doTest(true)
-
   fun testIfExpression() = doTest(true)
-
   fun testKeywordExpression() = doTest(true)
-
   fun testLambdaExpression() = doTest(true)
-
   fun testPrimaryExpression() = doTest(true)
-
   fun testUnaryExpression() = doTest(true)
+
+  override fun getTestDataPath(): String = "src/test/testData"
 }

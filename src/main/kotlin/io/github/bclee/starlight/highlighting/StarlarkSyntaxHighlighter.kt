@@ -24,8 +24,8 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.tree.IElementType
-import org.jetbrains.bazel.languages.starlark.elements.StarlarkTokenTypes
-import org.jetbrains.bazel.languages.starlark.lexer.StarlarkHighlightingLexer
+import io.github.bclee.starlight.elements.StarlarkTokenTypes
+import io.github.bclee.starlight.lexer.StarlarkHighlightingLexer
 
 object StarlarkSyntaxHighlighter : SyntaxHighlighterBase() {
   private val keys =

@@ -1,0 +1,33 @@
+<idea-plugin>
+    <id>io.github.bc-lee.starlight</id>
+    <name>Starlight</name>
+    <vendor>bc-lee</vendor>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <resource-bundle>messages.StarlarkBundle</resource-bundle>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType
+            name="Starlark"
+            language="Starlark"
+            implementationClass="io.github.bclee.starlight.StarlarkFileType"
+            fieldName="INSTANCE"
+            extensions="bzl;bazel"
+            fileNames="BUILD;WORKSPACE;MODULE.bazel"
+        />
+
+        <lang.parserDefinition
+            language="Starlark"
+            implementationClass="io.github.bclee.starlight.parser.StarlarkParserDefinition"
+        />
+        <lang.syntaxHighlighterFactory
+            language="Starlark"
+            implementationClass="io.github.bclee.starlight.highlighting.StarlarkSyntaxHighlighterFactory"
+        />
+        <lang.commenter
+            language="Starlark"
+            implementationClass="io.github.bclee.starlight.commenter.StarlarkCommenter"
+        />
+    </extensions>
+</idea-plugin>
