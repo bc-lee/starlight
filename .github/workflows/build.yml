@@ -1,0 +1,77 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+    tags: [ '*.*.*' ]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v6
+        with:
+          # The git-based version logic needs tag/history metadata; shallow checkouts degrade to hash-only versions.
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: zulu
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Build plugin
+        run: ./gradlew clean buildPlugin
+
+      - name: Run Tests
+        run: ./gradlew check
+
+      - name: Select Plugin Artifact
+        id: artifact
+        shell: bash
+        run: |
+          shopt -s nullglob
+          artifacts=(build/distributions/*.zip)
+
+          if [ "${#artifacts[@]}" -eq 0 ]; then
+            echo "No plugin zip found in build/distributions" >&2
+            exit 1
+          fi
+
+          if [ "${#artifacts[@]}" -ne 1 ]; then
+            echo "Expected exactly one plugin zip, found ${#artifacts[@]}" >&2
+            printf '%s\n' "${artifacts[@]}" >&2
+            exit 1
+          fi
+
+          artifact_path="${artifacts[0]}"
+          artifact_name="$(basename "${artifact_path%.zip}")"
+
+          echo "path=$artifact_path" >> "$GITHUB_OUTPUT"
+          echo "name=$artifact_name" >> "$GITHUB_OUTPUT"
+
+      - name: Upload plugin artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ steps.artifact.outputs.name }}
+          path: ${{ steps.artifact.outputs.path }}
+          archive: false
+
+      - name: Collect Tests Result
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: tests-result
+          path: build/reports/tests
