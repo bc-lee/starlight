@@ -1,0 +1,3 @@
+FILE
+  ASTWrapperPsiElement(PASS_STATEMENT)
+    PsiElement(Starlark:pass)('pass')

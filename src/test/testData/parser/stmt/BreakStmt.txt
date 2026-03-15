@@ -1,0 +1,3 @@
+FILE
+  ASTWrapperPsiElement(BREAK_STATEMENT)
+    PsiElement(Starlark:break)('break')
