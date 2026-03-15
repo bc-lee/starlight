@@ -2,16 +2,25 @@ import org.jetbrains.changelog.Changelog
 import org.jetbrains.grammarkit.tasks.GenerateLexerTask
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
+val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
+
 plugins {
     id("java")
     id("org.jetbrains.grammarkit") version "2023.3.0.2"
     alias(libs.plugins.changelog)
+    alias(libs.plugins.gitVersion)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.intelliJPlatform)
 }
 
 group = providers.gradleProperty("pluginGroup").get()
-version = providers.gradleProperty("pluginVersion").get()
+val basePluginVersion = providers.gradleProperty("pluginVersion").get()
+val gitDetails = versionDetails()
+version = if (gitDetails.isCleanTag) {
+    gitDetails.version
+} else {
+    "$basePluginVersion-dev.${gitDetails.gitHash}"
+}
 
 kotlin {
     jvmToolchain(21)
@@ -69,7 +78,7 @@ sourceSets {
 intellijPlatform {
     pluginConfiguration {
         name = providers.gradleProperty("pluginName")
-        version = providers.gradleProperty("pluginVersion")
+        version = project.provider { project.version.toString() }
         description = "Starlark language support for Bazel files: syntax highlighting, line comments, and parser errors."
         val changelog = project.changelog // local variable for configuration cache compatibility
         changeNotes.set(providers.gradleProperty("pluginVersion").map { pluginVersion ->
