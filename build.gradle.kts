@@ -16,7 +16,8 @@ plugins {
 group = providers.gradleProperty("pluginGroup").get()
 val basePluginVersion = providers.gradleProperty("pluginVersion").get()
 val gitDetails = versionDetails()
-version = if (gitDetails.isCleanTag) {
+val semVerTagPattern = Regex("""\d+\.\d+\.\d+""")
+version = if (gitDetails.isCleanTag && semVerTagPattern.matches(gitDetails.version)) {
     gitDetails.version
 } else {
     "$basePluginVersion-dev.${gitDetails.gitHash}"
