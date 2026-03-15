@@ -1,16 +1,16 @@
 import org.jetbrains.changelog.Changelog
-import org.jetbrains.grammarkit.tasks.GenerateLexerTask
+import org.jetbrains.intellij.platform.gradle.tasks.GenerateLexerTask
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
 
 plugins {
     id("java")
-    id("org.jetbrains.grammarkit") version "2023.3.0.2"
     alias(libs.plugins.changelog)
     alias(libs.plugins.gitVersion)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.intelliJPlatform)
+    alias(libs.plugins.intelliJPlatformGrammarKit)
 }
 
 group = providers.gradleProperty("pluginGroup").get()
@@ -40,6 +40,8 @@ dependencies {
 
     intellijPlatform {
         intellijIdea(providers.gradleProperty("platformVersion"))
+        grammarKit()
+        jflex()
 
         bundledPlugins(
             providers.gradleProperty("platformBundledPlugins").map {
