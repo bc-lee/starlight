@@ -1,9 +1,11 @@
+import org.jetbrains.changelog.Changelog
 import org.jetbrains.grammarkit.tasks.GenerateLexerTask
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
     id("java") // Java support
     id("org.jetbrains.grammarkit") version "2023.3.0.2"
+    alias(libs.plugins.changelog) // Gradle Changelog Plugin
     alias(libs.plugins.kotlin) // Kotlin support
     alias(libs.plugins.intelliJPlatform) // IntelliJ Platform Gradle Plugin
 }
@@ -78,6 +80,17 @@ intellijPlatform {
         name = providers.gradleProperty("pluginName")
         version = providers.gradleProperty("pluginVersion")
         description = "Starlark language support for Bazel files: syntax highlighting, line comments, and parser errors."
+        val changelog = project.changelog // local variable for configuration cache compatibility
+        changeNotes.set(providers.gradleProperty("pluginVersion").map { pluginVersion ->
+            with(changelog) {
+                renderItem(
+                    (getOrNull(pluginVersion) ?: getUnreleased())
+                        .withHeader(false)
+                        .withEmptySections(false),
+                    Changelog.OutputType.HTML,
+                )
+            }
+        })
 
         ideaVersion {
             sinceBuild = providers.gradleProperty("pluginSinceBuild")
@@ -91,6 +104,10 @@ intellijPlatform {
     }
 }
 
+changelog {
+    groups.empty()
+}
+
 tasks {
     named("compileKotlin") {
         dependsOn(generateStarlightLexer)
@@ -101,5 +118,9 @@ tasks {
 
     wrapper {
         gradleVersion = providers.gradleProperty("gradleVersion").get()
+    }
+
+    publishPlugin {
+        dependsOn(patchChangelog)
     }
 }
