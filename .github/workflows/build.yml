@@ -33,7 +33,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
 
       - name: Build plugin
-        run: ./gradlew clean buildPlugin
+        # The plugin version is derived from git state, which is not safe to reuse from Gradle's configuration cache.
+        run: ./gradlew --no-configuration-cache clean buildPlugin
 
       - name: Run Tests
         run: ./gradlew check
